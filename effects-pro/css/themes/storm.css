@@ -1,0 +1,126 @@
+/* Effects Pro - Storm theme */
+#tdv-effects-root .tdv-storm {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+#tdv-effects-root .tdv-storm .tdv-storm-bg {
+  background: linear-gradient(to bottom, #0a0e27 0%, #1a1f3a 50%, #0d1221 100%);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  transition: ease-out 250ms;
+  animation: tdv-storm-lightning var(--tdv-storm-cycle, 6000ms) infinite;
+}
+
+#tdv-effects-root .tdv-storm .tdv-storm-rain {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+#tdv-effects-root .tdv-storm .tdv-storm-bolt {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 150;
+  pointer-events: none;
+  opacity: 0;
+}
+
+#tdv-effects-root .tdv-storm .tdv-storm-bolt svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes tdv-storm-lightning {
+  0%,
+  100% {
+    filter: opacity(0.5) grayscale(80%) contrast(4) brightness(0.2);
+  }
+
+  8% {
+    filter: opacity(0.5) grayscale(80%) contrast(4) brightness(0.2);
+  }
+
+  9.5% {
+    filter: opacity(1) grayscale(0%) contrast(1) brightness(1);
+  }
+
+  10% {
+    filter: opacity(0.5) grayscale(80%) contrast(4) brightness(0.2);
+  }
+
+  73% {
+    filter: opacity(0.5) grayscale(80%) contrast(4) brightness(0.2);
+  }
+
+  75% {
+    filter: opacity(1) grayscale(0%) contrast(1) brightness(1);
+  }
+
+  77% {
+    filter: opacity(0.5) grayscale(80%) contrast(4) brightness(0.2);
+  }
+
+  80% {
+    filter: opacity(1) grayscale(0%) contrast(1) brightness(1);
+  }
+
+  90% {
+    filter: opacity(0.5) grayscale(80%) contrast(4) brightness(0.2);
+  }
+}
+
+@keyframes tdv-storm-bolt-flash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  15% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.8;
+  }
+
+  25% {
+    opacity: 0;
+  }
+}
+
+#tdv-effects-root .tdv-storm .tdv-storm-bolt.bolt-1 {
+  animation: tdv-storm-bolt-flash 500ms;
+  animation-delay: 0.57s;
+}
+
+#tdv-effects-root .tdv-storm .tdv-storm-bolt.bolt-2 {
+  animation: tdv-storm-bolt-flash 600ms;
+  animation-delay: 4.5s;
+}
+
+#tdv-effects-root .tdv-storm .tdv-storm-bolt.bolt-3 {
+  animation: tdv-storm-bolt-flash 550ms;
+  animation-delay: 4.65s;
+}
+
+#tdv-effects-root .tdv-storm .tdv-storm-bolt.bolt-4 {
+  animation: tdv-storm-bolt-flash 500ms;
+  animation-delay: 4.8s;
+}

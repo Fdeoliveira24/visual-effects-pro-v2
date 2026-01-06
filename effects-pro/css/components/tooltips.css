@@ -1,0 +1,90 @@
+/* Sidebar tooltips (kept separate from dashboard layout styles). */
+:root {
+  --tdv-tooltip-bg: rgb(15 23 42 / 0.92);
+  --tdv-tooltip-border: rgb(118 145 183 / 0.25);
+  --tdv-tooltip-text: #eef2f8;
+  --tdv-tooltip-shadow: rgb(0 0 0 / 0.45);
+}
+
+.sidebar-collapsed .sidebar [data-tooltip]:not([data-tooltip=""]) {
+  position: relative;
+}
+
+.sidebar-collapsed .sidebar [data-tooltip]:not([data-tooltip=""]):is(:hover, :focus-visible) {
+  z-index: 60;
+}
+
+.sidebar-collapsed .sidebar [data-tooltip]:not([data-tooltip=""])::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translate(10px, -50%);
+  background: var(--tdv-tooltip-bg);
+  color: var(--tdv-tooltip-text);
+  border: 1px solid var(--tdv-tooltip-border);
+  padding: 8px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 14px 30px var(--tdv-tooltip-shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+  z-index: 2000;
+}
+
+.sidebar-collapsed .sidebar [data-tooltip]:not([data-tooltip=""])::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translate(4px, -50%) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background: var(--tdv-tooltip-bg);
+  border-left: 1px solid var(--tdv-tooltip-border);
+  border-bottom: 1px solid var(--tdv-tooltip-border);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+  z-index: 1999;
+}
+
+.sidebar-collapsed .sidebar [data-tooltip]:not([data-tooltip=""]):is(:hover, :focus-visible)::after,
+.sidebar-collapsed
+  .sidebar
+  [data-tooltip]:not([data-tooltip=""]):is(:hover, :focus-visible)::before {
+  opacity: 1;
+}
+
+.sidebar-collapsed
+  .sidebar
+  [data-tooltip]:not([data-tooltip=""]):is(:hover, :focus-visible)::after {
+  transform: translate(14px, -50%);
+}
+
+.sidebar-collapsed
+  .sidebar
+  [data-tooltip]:not([data-tooltip=""]):is(:hover, :focus-visible)::before {
+  transform: translate(8px, -50%) rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-collapsed .sidebar [data-tooltip]::after,
+  .sidebar-collapsed .sidebar [data-tooltip]::before {
+    transition: none;
+  }
+}
+
+@media (hover: none) {
+  .sidebar-collapsed .sidebar [data-tooltip]::after,
+  .sidebar-collapsed .sidebar [data-tooltip]::before {
+    display: none;
+  }
+}
