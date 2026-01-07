@@ -2800,6 +2800,570 @@
     return container;
   }
 
+  const BALLOONS_STYLE_ID = "tdv-balloons-style";
+  const BALLOONS_CSS = `
+			    #tdv-effects-root .tdv-balloons{position:absolute;inset:0;pointer-events:none;}
+			    #tdv-effects-root .tdv-balloons canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;}
+			  `;
+
+  function ensureBalloonsStylesInjected() {
+    if (!dom) return;
+    if (typeof dom.ensureStylesheet === "function") {
+      dom.ensureStylesheet("css/themes/balloons.css", BALLOONS_STYLE_ID, BALLOONS_CSS);
+      return;
+    }
+    if (typeof dom.injectStyles === "function") {
+      dom.injectStyles(BALLOONS_CSS, BALLOONS_STYLE_ID);
+    }
+  }
+
+  // eslint-disable-next-line max-lines-per-function
+  function createBalloonsOverlay(ctx, cfg) {
+    ensureBalloonsStylesInjected();
+
+    const initialCfg = cfg || {};
+    function getLiveCfg() {
+      try {
+        if (ctx && typeof ctx.getConfig === "function") {
+          const rootCfg = ctx.getConfig();
+          const live = rootCfg && rootCfg.themes ? rootCfg.themes.balloons : null;
+          if (live && typeof live === "object") return live;
+        }
+      } catch {
+        // ignore
+      }
+      return initialCfg;
+    }
+
+    const container = document.createElement("div");
+    container.className = "tdv-effect-layer tdv-balloons";
+    container.setAttribute("aria-hidden", "true");
+
+    const canvas = document.createElement("canvas");
+    container.appendChild(canvas);
+
+    const ctx2d = canvas.getContext("2d", { alpha: true });
+    if (!ctx2d) return container;
+
+    const prefersReducedMotion =
+      dom && typeof dom.prefersReducedMotion === "function"
+        ? dom.prefersReducedMotion(ctx.getConfig && ctx.getConfig())
+        : false;
+
+    const clampFn =
+      typeof clamp === "function"
+        ? clamp
+        : (value, min, max) => Math.min(max, Math.max(min, value));
+
+    function clampNum(value, min, max, fallback) {
+      const v = Number(value);
+      if (!Number.isFinite(v)) return fallback;
+      return clampFn(v, min, max);
+    }
+
+    function randFloat(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function randInt(min, max) {
+      return Math.floor(randFloat(min, max + 1));
+    }
+
+    function pickOne(list) {
+      if (!Array.isArray(list) || !list.length) return null;
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function parseBool(value, fallback) {
+      if (typeof value === "boolean") return value;
+      if (typeof value === "string") {
+        const v = value.toLowerCase().trim();
+        if (v === "true") return true;
+        if (v === "false") return false;
+      }
+      if (typeof value === "number") return value !== 0;
+      return fallback;
+    }
+
+    function getDpr() {
+      return dom && typeof dom.getEffectiveDevicePixelRatio === "function"
+        ? dom.getEffectiveDevicePixelRatio(ctx.getConfig && ctx.getConfig())
+        : 1;
+    }
+
+    let stopped = false;
+    let rafId = null;
+    let resizeTimer = null;
+    let reducedFrame = 0;
+
+    let w = 1;
+    let h = 1;
+    let dpr = 1;
+
+    let timeFrames = 0;
+    let spawnAccumulatorFrames = 0;
+    let lastTs = performance.now();
+
+    const balloons = [];
+
+    function resize() {
+      const size = ctx.getStageSize
+        ? ctx.getStageSize()
+        : { w: window.innerWidth || 800, h: window.innerHeight || 600 };
+
+      w = Math.max(1, Math.floor(size.w));
+      h = Math.max(1, Math.floor(size.h));
+      dpr = Math.max(1, Number(getDpr()) || 1);
+
+      canvas.width = Math.max(1, Math.floor(w * dpr));
+      canvas.height = Math.max(1, Math.floor(h * dpr));
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+
+      try {
+        ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+      } catch {
+        // ignore
+      }
+    }
+
+    function pickDirection(dir, pm) {
+      const normalized = dir ? String(dir) : "bottom";
+      if (normalized === "mixed") {
+        return pickOne(["bottom", "top", "left", "right", "diagonal"]);
+      }
+      if (normalized === "diagonal") return pm > 0 ? "diagonalRight" : "diagonalLeft";
+      return normalized;
+    }
+
+    function pickHue(liveCfg, pm) {
+      const mode = liveCfg && liveCfg.colorMode ? String(liveCfg.colorMode) : "single";
+      if (mode === "dual") return pm > 0 ? 210 : 10;
+      if (mode === "rainbow") return Math.floor(Math.random() * 360);
+      if (mode === "custom") {
+        const customColor = normalizeHexColor(liveCfg && liveCfg.customColorHex);
+        if (customColor) return customColor;
+        return Math.round(clampNum(liveCfg.customHue, 0, 360, 210));
+      }
+      return 210;
+    }
+
+    function normalizeHexColor(value) {
+      if (!value) return null;
+      const raw = String(value).trim();
+      if (!raw) return null;
+      const stripped = raw[0] === "#" ? raw.slice(1) : raw;
+      if (!stripped) return null;
+
+      const normalized =
+        stripped.length === 3
+          ? stripped
+              .split("")
+              .map((c) => c + c)
+              .join("")
+          : stripped;
+
+      if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null;
+      return `#${normalized.toLowerCase()}`;
+    }
+
+    function hexToRgb(hex) {
+      const normalized = normalizeHexColor(hex);
+      if (!normalized) return null;
+      const n = parseInt(normalized.slice(1), 16);
+      return {
+        r: (n >> 16) & 0xff,
+        g: (n >> 8) & 0xff,
+        b: n & 0xff,
+      };
+    }
+
+    function mixRgb(from, to, t) {
+      const tt = clampNum(t, 0, 1, 0);
+      return {
+        r: Math.round(from.r + (to.r - from.r) * tt),
+        g: Math.round(from.g + (to.g - from.g) * tt),
+        b: Math.round(from.b + (to.b - from.b) * tt),
+      };
+    }
+
+    function rgba(rgb, alpha) {
+      const a = clampNum(alpha, 0, 1, 1);
+      return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${a})`;
+    }
+
+    function createGradient(ctxDraw, cx, cy, r, hueOrHex, opacity) {
+      const grd = ctxDraw.createRadialGradient(
+        cx - 0.5 * r,
+        cy - 1.7 * r,
+        0,
+        cx - 0.5 * r,
+        cy - 1.7 * r,
+        r
+      );
+      const alpha = clampNum(opacity, 0, 1, 1);
+
+      if (typeof hueOrHex === "string") {
+        const rgb = hexToRgb(hueOrHex);
+        if (rgb) {
+          const light = mixRgb(rgb, { r: 255, g: 255, b: 255 }, 0.35);
+          const mid = mixRgb(rgb, { r: 255, g: 255, b: 255 }, 0.12);
+          const dark = mixRgb(rgb, { r: 0, g: 0, b: 0 }, 0.55);
+          grd.addColorStop(0, rgba(light, 0.95 * alpha));
+          grd.addColorStop(0.4, rgba(mid, 0.85 * alpha));
+          grd.addColorStop(1, rgba(dark, 0.8 * alpha));
+          return grd;
+        }
+      }
+
+      const hue = Math.round(clampNum(hueOrHex, 0, 360, 210));
+      grd.addColorStop(0, `hsla(${hue}, 100%, 65%, ${0.95 * alpha})`);
+      grd.addColorStop(0.4, `hsla(${hue}, 100%, 45%, ${0.85 * alpha})`);
+      grd.addColorStop(1, `hsla(${hue}, 100%, 25%, ${0.8 * alpha})`);
+      return grd;
+    }
+
+    function drawBalloonShape(ctxDraw, cx, cy, r, R, kappa) {
+      const kappaNum = clampNum(kappa, 0.1, 1.0, 0.5522847498);
+      const or = r * kappaNum;
+
+      const p1 = { x: cx - r, y: cy };
+      const pc11 = { x: p1.x, y: p1.y + or };
+      const pc12 = { x: p1.x, y: p1.y - or };
+      const p2 = { x: cx, y: cy - r };
+      const pc21 = { x: cx - or, y: p2.y };
+      const pc22 = { x: cx + or, y: p2.y };
+      const p3 = { x: cx + r, y: cy };
+      const pc31 = { x: p3.x, y: p3.y - or };
+      const pc32 = { x: p3.x, y: p3.y + or };
+      const p4 = { x: cx, y: cy + R };
+      const pc41 = { x: p4.x + or, y: p4.y };
+      const pc42 = { x: p4.x - or, y: p4.y };
+
+      const rad = Math.PI / 180;
+      const t1 = {
+        x: p4.x + 0.2 * r * Math.cos(70 * rad),
+        y: p4.y + 0.2 * r * Math.sin(70 * rad),
+      };
+      const t2 = {
+        x: p4.x + 0.2 * r * Math.cos(110 * rad),
+        y: p4.y + 0.2 * r * Math.sin(110 * rad),
+      };
+
+      ctxDraw.beginPath();
+      ctxDraw.moveTo(p4.x, p4.y);
+      ctxDraw.bezierCurveTo(pc42.x, pc42.y, pc11.x, pc11.y, p1.x, p1.y);
+      ctxDraw.bezierCurveTo(pc12.x, pc12.y, pc21.x, pc21.y, p2.x, p2.y);
+      ctxDraw.bezierCurveTo(pc22.x, pc22.y, pc31.x, pc31.y, p3.x, p3.y);
+      ctxDraw.bezierCurveTo(pc32.x, pc32.y, pc41.x, pc41.y, p4.x, p4.y);
+      ctxDraw.lineTo(t1.x, t1.y);
+      ctxDraw.lineTo(t2.x, t2.y);
+      ctxDraw.closePath();
+      ctxDraw.fill();
+    }
+
+    class Balloon {
+      constructor(liveCfg) {
+        this.pm = Math.random() < 0.5 ? -1 : 1;
+
+        const minSize = clampNum(liveCfg.minSize, 10, 200, 20);
+        const maxSize = clampNum(liveCfg.maxSize, minSize, 300, 70);
+        this.r = randInt(Math.round(minSize), Math.round(maxSize));
+
+        this.heightRatio = clampNum(liveCfg.heightRatio, 1.0, 2.0, 1.4);
+        this.stringLength = clampNum(liveCfg.stringLength, 1, 12, 4.5);
+        this.R = this.heightRatio * this.r;
+        this.a = this.r * this.stringLength;
+
+        const minSpeed = clampNum(liveCfg.minSpeed, 0.1, 20, 1.5);
+        const maxSpeed = clampNum(liveCfg.maxSpeed, minSpeed, 40, 4);
+        this.speed = randFloat(minSpeed, maxSpeed);
+        this.k = this.speed / 5;
+
+        this.colorMode = liveCfg && liveCfg.colorMode ? String(liveCfg.colorMode) : "single";
+        this.hue = pickHue(liveCfg, this.pm);
+        this.dir = pickDirection(liveCfg.direction, this.pm);
+
+        this.x = 0;
+        this.y = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.cx = 0;
+        this.cy = 0;
+
+        this.reset(liveCfg);
+      }
+
+      reset(liveCfg) {
+        this.dir = pickDirection(liveCfg.direction, this.pm);
+        this.colorMode = liveCfg && liveCfg.colorMode ? String(liveCfg.colorMode) : "single";
+        this.hue = pickHue(liveCfg, this.pm);
+
+        const margin = Math.max(60, this.r * 2);
+
+        const chooseX = () => randFloat(this.r, w - this.r);
+        const chooseY = () => randFloat(this.r, h - this.r);
+
+        const dir = this.dir;
+        const baseSpeed = this.speed;
+
+        if (dir === "top") {
+          this.x = chooseX();
+          this.y = -margin;
+          this.vx = 0;
+          this.vy = baseSpeed;
+          return;
+        }
+
+        if (dir === "left") {
+          this.x = -margin;
+          this.y = chooseY();
+          this.vx = baseSpeed;
+          this.vy = 0;
+          return;
+        }
+
+        if (dir === "right") {
+          this.x = w + margin;
+          this.y = chooseY();
+          this.vx = -baseSpeed;
+          this.vy = 0;
+          return;
+        }
+
+        if (dir === "diagonalRight") {
+          const d = baseSpeed / Math.SQRT2;
+          this.x = -margin;
+          this.y = h + margin;
+          this.vx = d;
+          this.vy = -d;
+          return;
+        }
+
+        if (dir === "diagonalLeft") {
+          const d = baseSpeed / Math.SQRT2;
+          this.x = w + margin;
+          this.y = h + margin;
+          this.vx = -d;
+          this.vy = -d;
+          return;
+        }
+
+        // bottom (default): rise up
+        this.x = chooseX();
+        this.y = h + margin;
+        this.vx = 0;
+        this.vy = -baseSpeed;
+      }
+
+      isOffscreen(liveCfg) {
+        const stringLength = clampNum(liveCfg.stringLength, 1, 12, 4.5);
+        const a = this.r * stringLength;
+        const margin = Math.max(80, a);
+
+        if (this.dir === "top") return this.y > h + margin + a;
+        if (this.dir === "left") return this.x > w + margin;
+        if (this.dir === "right") return this.x < -margin;
+        if (this.dir === "diagonalRight") return this.y < -margin || this.x > w + margin;
+        if (this.dir === "diagonalLeft") return this.y < -margin || this.x < -margin;
+        return this.y < -margin - a;
+      }
+
+      update(liveCfg, deltaFrames) {
+        const nextDir = pickDirection(liveCfg.direction, this.pm);
+        if (nextDir !== this.dir) {
+          this.dir = nextDir;
+          this.reset(liveCfg);
+        }
+
+        const nextColorMode = liveCfg && liveCfg.colorMode ? String(liveCfg.colorMode) : "single";
+        if (nextColorMode !== this.colorMode) {
+          this.colorMode = nextColorMode;
+          this.hue = pickHue(liveCfg, this.pm);
+        } else if (nextColorMode === "custom") {
+          const nextHue = pickHue(liveCfg, this.pm);
+          if (nextHue !== this.hue) this.hue = nextHue;
+        }
+
+        this.heightRatio = clampNum(liveCfg.heightRatio, 1.0, 2.0, 1.4);
+        this.stringLength = clampNum(liveCfg.stringLength, 1, 12, 4.5);
+        this.R = this.heightRatio * this.r;
+        this.a = this.r * this.stringLength;
+
+        this.x += this.vx * deltaFrames;
+        this.y += this.vy * deltaFrames;
+
+        if (this.isOffscreen(liveCfg)) this.reset(liveCfg);
+      }
+
+      draw(ctxDraw, liveCfg, frame) {
+        const showStrings = parseBool(liveCfg.showStrings, true);
+        const showGradient = parseBool(liveCfg.showGradient, true);
+        const opacity = clampNum(liveCfg.opacity, 0, 1, 1);
+        const kappa = clampNum(liveCfg.kappa, 0.1, 1.0, 0.5522847498);
+
+        let cx = this.x;
+        let cy = this.y - this.R;
+
+        if (showStrings) {
+          const waveAmp = clampNum(liveCfg.waveAmplitude, 0, 200, 50);
+          const waveFreq = clampNum(liveCfg.waveFrequency, 1, 100, 25);
+          const rad = Math.PI / 180;
+          const k = this.k * (waveFreq / 25);
+          const step = Math.max(1, Math.round(this.r / 6));
+
+          ctxDraw.beginPath();
+          let started = false;
+          let x = this.x;
+          let y = this.y;
+
+          for (let i = Math.max(1, Math.round(this.a)); i >= 0; i -= step) {
+            const t = i * rad;
+            x = this.x + this.pm * waveAmp * Math.cos(k * t - frame * rad);
+            y = this.y + this.pm * (waveAmp * 0.5) * Math.sin(k * t - frame * rad) + 50 * t;
+            if (!started) {
+              ctxDraw.moveTo(x, y);
+              started = true;
+            } else {
+              ctxDraw.lineTo(x, y);
+            }
+          }
+          ctxDraw.stroke();
+
+          cx = x;
+          cy = y - this.R;
+        }
+
+        if (showGradient) {
+          ctxDraw.fillStyle = createGradient(ctxDraw, cx, cy, this.r, this.hue, opacity);
+        } else {
+          const alpha = clampNum(opacity, 0, 1, 1);
+          if (typeof this.hue === "string") {
+            const rgb = hexToRgb(this.hue);
+            ctxDraw.fillStyle = rgb ? rgba(rgb, alpha) : `hsla(210, 100%, 50%, ${alpha})`;
+          } else {
+            ctxDraw.fillStyle = `hsla(${this.hue}, 100%, 50%, ${alpha})`;
+          }
+        }
+
+        drawBalloonShape(ctxDraw, cx, cy, this.r, this.R, kappa);
+
+        this.cx = cx;
+        this.cy = cy;
+      }
+    }
+
+    function enforceMax(liveCfg) {
+      const maxBalloons = Math.max(1, Math.round(clampNum(liveCfg.maxBalloons, 1, 200, 37)));
+      if (balloons.length > maxBalloons) {
+        balloons.splice(maxBalloons);
+      }
+      return maxBalloons;
+    }
+
+    function spawnBalloon(liveCfg) {
+      const maxBalloons = enforceMax(liveCfg);
+      if (balloons.length >= maxBalloons) return;
+      balloons.push(new Balloon(liveCfg));
+    }
+
+    function onResize() {
+      if (stopped) return;
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (stopped) return;
+        resize();
+      }, 120);
+    }
+
+    function loop(ts) {
+      if (stopped) return;
+      if (!container.isConnected) {
+        stop();
+        return;
+      }
+
+      const liveCfg = getLiveCfg();
+      const animate = parseBool(liveCfg.animate, true);
+      enforceMax(liveCfg);
+
+      const now = Number(ts) || performance.now();
+      if (document.visibilityState !== "visible") {
+        lastTs = now;
+        rafId = requestAnimationFrame(loop);
+        return;
+      }
+
+      const dtSec = Math.min(0.2, Math.max(0, (now - lastTs) / 1000));
+      lastTs = now;
+
+      if (prefersReducedMotion) {
+        reducedFrame += 1;
+        if (reducedFrame % 2 === 1) {
+          rafId = requestAnimationFrame(loop);
+          return;
+        }
+      }
+
+      const deltaFrames = dtSec * 60;
+
+      if (animate) {
+        timeFrames += deltaFrames;
+        spawnAccumulatorFrames += deltaFrames;
+
+        const spawnRate = Math.max(1, Math.round(clampNum(liveCfg.spawnRate, 1, 240, 37)));
+        while (spawnAccumulatorFrames >= spawnRate) {
+          spawnAccumulatorFrames -= spawnRate;
+          spawnBalloon(liveCfg);
+        }
+
+        for (let i = 0; i < balloons.length; i++) {
+          balloons[i].update(liveCfg, deltaFrames);
+        }
+      }
+
+      ctx2d.clearRect(0, 0, w, h);
+      ctx2d.globalCompositeOperation = "source-over";
+      ctx2d.lineWidth = 1;
+      ctx2d.lineCap = "round";
+      ctx2d.strokeStyle = liveCfg.stringColor ? String(liveCfg.stringColor) : "#abcdef";
+
+      const frame = Math.floor(timeFrames);
+      for (let i = 0; i < balloons.length; i++) {
+        balloons[i].draw(ctx2d, liveCfg, frame);
+      }
+
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function stop() {
+      if (stopped) return;
+      stopped = true;
+      try {
+        if (rafId) cancelAnimationFrame(rafId);
+      } catch {
+        // ignore
+      }
+      try {
+        if (resizeTimer) clearTimeout(resizeTimer);
+      } catch {
+        // ignore
+      }
+      try {
+        window.removeEventListener("resize", onResize);
+      } catch {
+        // ignore
+      }
+      if (container.parentNode) container.parentNode.removeChild(container);
+    }
+
+    container._stopBalloons = stop;
+    window.addEventListener("resize", onResize, { passive: true });
+    resize();
+    rafId = requestAnimationFrame(loop);
+    return container;
+  }
+
   const STORM_STYLE_ID = "tdv-storm-style";
   const STORM_CSS = `
 			    #tdv-effects-root .tdv-storm{position:absolute;inset:0;overflow:hidden;}
@@ -4591,6 +5155,7 @@
       else if (cfg.type === "spinningRays") el = createSpinningRaysOverlay(ctx, cfg);
       else if (cfg.type === "sineWaves") el = createSineWavesOverlay(ctx, cfg);
       else if (cfg.type === "flowers") el = createFlowersOverlay(ctx, cfg);
+      else if (cfg.type === "balloons") el = createBalloonsOverlay(ctx, cfg);
       else if (cfg.type === "storm") el = createStormOverlay(ctx, cfg);
       else if (cfg.type === "electric") el = createElectricOverlay(ctx, cfg);
       else if (cfg.type === "christmasLights") el = createChristmasLightsOverlay(ctx, cfg);
@@ -4668,6 +5233,14 @@
         if (el && typeof el._stopFlowers === "function") {
           handledRemoval = true;
           el._stopFlowers();
+        }
+      } catch {
+        // ignore
+      }
+      try {
+        if (el && typeof el._stopBalloons === "function") {
+          handledRemoval = true;
+          el._stopBalloons();
         }
       } catch {
         // ignore

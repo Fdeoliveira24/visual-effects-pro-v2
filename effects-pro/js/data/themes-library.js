@@ -234,6 +234,29 @@
       petalHighlightAlpha: 0.4,
       centerHighlightAlpha: 0.6,
     },
+    balloons: {
+      type: "balloons",
+      cssOnly: true,
+      animate: true,
+      direction: "bottom", // bottom | top | left | right | diagonal | mixed
+      colorMode: "single", // single | dual | rainbow | custom
+      customHue: 210,
+      customColorHex: "#4fc3f7",
+      minSize: 20,
+      maxSize: 70,
+      minSpeed: 1.5,
+      maxSpeed: 4,
+      spawnRate: 37, // frames between spawns (60fps ≈ 1.6 spawns/sec)
+      maxBalloons: 37,
+      waveAmplitude: 50,
+      waveFrequency: 25,
+      stringLength: 4.5,
+      heightRatio: 1.4,
+      showStrings: true,
+      showGradient: true,
+      stringColor: "#abcdef",
+      kappa: 0.5522847498,
+    },
     easter: {
       emissionRate: 12,
       maxParticles: 160,

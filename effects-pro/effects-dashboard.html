@@ -100,6 +100,20 @@
                     </svg>
                     <span class="btn-label">Reset</span>
                   </button>
+                  <button
+                    class="btn ghost"
+                    id="copyTourCode"
+                    type="button"
+                    data-tooltip="Copy tour button code"
+                  >
+                    <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M5.5 1.75A1.75 1.75 0 0 1 7.25 0h6A1.75 1.75 0 0 1 15 1.75v7A1.75 1.75 0 0 1 13.25 10.5h-6A1.75 1.75 0 0 1 5.5 8.75v-7Zm1.75-.25a.25.25 0 0 0-.25.25v7c0 .14.11.25.25.25h6a.25.25 0 0 0 .25-.25v-7a.25.25 0 0 0-.25-.25h-6ZM1 6.75C1 5.78 1.78 5 2.75 5h1.1a.75.75 0 0 1 0 1.5h-1.1a.25.25 0 0 0-.25.25v7c0 .14.11.25.25.25h6c.14 0 .25-.11.25-.25v-1.1a.75.75 0 0 1 1.5 0v1.1A1.75 1.75 0 0 1 8.75 16h-6A1.75 1.75 0 0 1 1 14.25v-7Z"
+                      />
+                    </svg>
+                    <span class="btn-label">Copy Tour Code</span>
+                  </button>
                 </div>
                 <div class="now-playing" id="nowPlayingWrap" data-active="false">
                   <span class="now-dot"></span>
@@ -3143,6 +3157,239 @@
               </div>
             </div>
 
+            <!-- Balloons Theme Controls -->
+            <div
+              class="theme-controls"
+              id="balloonsThemeControls"
+              style="display: none; margin-top: 12px"
+            >
+              <div class="subhead" style="margin-bottom: 10px">Balloons</div>
+
+              <div class="field">
+                <label for="balloonsDirection">Direction</label>
+                <select id="balloonsDirection" data-path="themes.balloons.direction">
+                  <option value="bottom">Up</option>
+                  <option value="top">Down</option>
+                  <option value="left">Right</option>
+                  <option value="right">Left</option>
+                  <option value="diagonal">Diagonal</option>
+                  <option value="mixed">Mixed</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="balloonsColorMode">Color mode</label>
+                <select id="balloonsColorMode" data-path="themes.balloons.colorMode">
+                  <option value="single">Single</option>
+                  <option value="dual">Dual</option>
+                  <option value="rainbow">Rainbow</option>
+                  <option value="custom">Custom color</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="balloonsCustomColorHex">Custom color</label>
+                <input
+                  type="color"
+                  id="balloonsCustomColorHex"
+                  value="#4fc3f7"
+                  data-path="themes.balloons.customColorHex"
+                />
+              </div>
+
+              <div class="field">
+                <label for="balloonsMinSize">Size min</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsMinSize"
+                    min="10"
+                    max="120"
+                    step="1"
+                    data-path="themes.balloons.minSize"
+                    data-output="balloonsMinSizeOut"
+                  />
+                  <output id="balloonsMinSizeOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsMaxSize">Size max</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsMaxSize"
+                    min="20"
+                    max="200"
+                    step="1"
+                    data-path="themes.balloons.maxSize"
+                    data-output="balloonsMaxSizeOut"
+                  />
+                  <output id="balloonsMaxSizeOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsMinSpeed">Speed min</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsMinSpeed"
+                    min="0.2"
+                    max="8"
+                    step="0.1"
+                    data-path="themes.balloons.minSpeed"
+                    data-output="balloonsMinSpeedOut"
+                  />
+                  <output id="balloonsMinSpeedOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsMaxSpeed">Speed max</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsMaxSpeed"
+                    min="0.5"
+                    max="15"
+                    step="0.1"
+                    data-path="themes.balloons.maxSpeed"
+                    data-output="balloonsMaxSpeedOut"
+                  />
+                  <output id="balloonsMaxSpeedOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsSpawnRate">Spawn interval (frames)</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsSpawnRate"
+                    min="1"
+                    max="120"
+                    step="1"
+                    data-path="themes.balloons.spawnRate"
+                    data-output="balloonsSpawnRateOut"
+                  />
+                  <output id="balloonsSpawnRateOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsMaxBalloons">Max balloons</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsMaxBalloons"
+                    min="1"
+                    max="120"
+                    step="1"
+                    data-path="themes.balloons.maxBalloons"
+                    data-output="balloonsMaxBalloonsOut"
+                  />
+                  <output id="balloonsMaxBalloonsOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsWaveAmplitude">Wave amplitude</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsWaveAmplitude"
+                    min="0"
+                    max="200"
+                    step="1"
+                    data-path="themes.balloons.waveAmplitude"
+                    data-output="balloonsWaveAmplitudeOut"
+                  />
+                  <output id="balloonsWaveAmplitudeOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsWaveFrequency">Wave frequency</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsWaveFrequency"
+                    min="1"
+                    max="100"
+                    step="1"
+                    data-path="themes.balloons.waveFrequency"
+                    data-output="balloonsWaveFrequencyOut"
+                  />
+                  <output id="balloonsWaveFrequencyOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsStringLength">String length</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsStringLength"
+                    min="1"
+                    max="10"
+                    step="0.1"
+                    data-path="themes.balloons.stringLength"
+                    data-output="balloonsStringLengthOut"
+                  />
+                  <output id="balloonsStringLengthOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsHeightRatio">Height ratio</label>
+                <div class="range-row">
+                  <input
+                    type="range"
+                    id="balloonsHeightRatio"
+                    min="1"
+                    max="2"
+                    step="0.05"
+                    data-path="themes.balloons.heightRatio"
+                    data-output="balloonsHeightRatioOut"
+                  />
+                  <output id="balloonsHeightRatioOut"></output>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="balloonsStringColor">String color</label>
+                <input
+                  type="color"
+                  id="balloonsStringColor"
+                  data-path="themes.balloons.stringColor"
+                />
+              </div>
+
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  id="balloonsShowStrings"
+                  data-path="themes.balloons.showStrings"
+                />
+                <span>Show strings</span>
+              </label>
+
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  id="balloonsShowGradient"
+                  data-path="themes.balloons.showGradient"
+                />
+                <span>Color gradients</span>
+              </label>
+
+              <label class="toggle">
+                <input type="checkbox" id="balloonsAnimate" data-path="themes.balloons.animate" />
+                <span>Animate</span>
+              </label>
+            </div>
+
             <!-- Falling Stars Theme Controls -->
             <div
               class="theme-controls"
@@ -5469,6 +5716,7 @@
           "christmasLights",
           "easter",
           "flowers",
+          "balloons",
           "bubbles",
           "leaves",
           "fire",
@@ -5534,6 +5782,7 @@
           christmasLights: "Christmas Lights",
           easter: "Easter",
           flowers: "Flowers",
+          balloons: "Balloons",
           bubbles: "Bubbles",
           leaves: "Leaves",
           fire: "Fire",
@@ -5660,6 +5909,83 @@
           toast.style.borderColor = isError ? "var(--danger)" : "var(--accent-2)";
           toast.classList.add("show");
           setTimeout(() => toast.classList.remove("show"), 2200);
+        }
+
+        function escapeJsString(value) {
+          return String(value)
+            .replace(/\\/g, "\\\\")
+            .replace(/'/g, "\\'")
+            .replace(/\r/g, "\\r")
+            .replace(/\n/g, "\\n");
+        }
+
+        function buildTourButtonSnippet(selection) {
+          const type = selection && selection.type ? selection.type : "none";
+          const name = selection && selection.name ? selection.name : "none";
+
+          let trigger = "window.tourEffectsFunctions.stopAll();";
+          if (type === "theme" && name !== "none") {
+            trigger =
+              "window.tourEffectsFunctions.startOverlayTheme('" + escapeJsString(name) + "');";
+          } else if (type === "effect" && name !== "none") {
+            trigger = "window.tourEffectsFunctions.playEffect('" + escapeJsString(name) + "');";
+          }
+
+          return (
+            "try {\n" +
+            "\tif (window.tourEffectsFunctions) {\n" +
+            "\t\twindow.tourEffectsFunctions.loadConfig();\n" +
+            "\t\twindow.tourEffectsFunctions.initializeEffects(this);\n" +
+            "\n" +
+            "\t\tvar cfg = window.tourEffectsFunctions.getConfig ? window.tourEffectsFunctions.getConfig() : null;\n" +
+            "\t\tvar enabled = cfg ? cfg.enabled !== false : true;\n" +
+            "\t\tvar mode = cfg && cfg.mode ? cfg.mode : 'both';\n" +
+            "\n" +
+            "\t\tif (enabled && (mode === 'dom' || mode === 'both' || mode === 'button')) {\n" +
+            "\t\t\twindow.tourEffectsFunctions.enableDomOverlay(true);\n" +
+            "\t\t} else if (!enabled) {\n" +
+            "\t\t\twindow.tourEffectsFunctions.enableDomOverlay(false);\n" +
+            "\t\t}\n" +
+            "\n" +
+            "\t\t" +
+            trigger +
+            "\n" +
+            "\t} else {\n" +
+            "\t\tconsole.warn('Effects core not loaded yet (tourEffectsFunctions missing).');\n" +
+            "\t}\n" +
+            "} catch (error) {\n" +
+            "\tconsole.error('Effects button action error:', error);\n" +
+            "}"
+          );
+        }
+
+        function copyTextToClipboard(text) {
+          if (!text) return Promise.reject(new Error("Missing text"));
+
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+            return navigator.clipboard.writeText(text);
+          }
+
+          return new Promise((resolve, reject) => {
+            try {
+              const textarea = document.createElement("textarea");
+              textarea.value = text;
+              textarea.setAttribute("readonly", "");
+              textarea.style.position = "fixed";
+              textarea.style.top = "-1000px";
+              textarea.style.left = "-1000px";
+              textarea.style.opacity = "0";
+              document.body.appendChild(textarea);
+              textarea.focus();
+              textarea.select();
+              const ok = document.execCommand && document.execCommand("copy");
+              textarea.remove();
+              if (ok) resolve();
+              else reject(new Error("Copy command failed"));
+            } catch (err) {
+              reject(err);
+            }
+          });
         }
 
         function createRadioCard(id, value, label) {
@@ -6007,6 +6333,11 @@
           const sineControls = byId("sineWavesThemeControls");
           if (sineControls) {
             sineControls.style.display = isTheme && effectName === "sineWaves" ? "" : "none";
+          }
+
+          const balloonsControls = byId("balloonsThemeControls");
+          if (balloonsControls) {
+            balloonsControls.style.display = isTheme && effectName === "balloons" ? "" : "none";
           }
 
           const fallingStarsControls = byId("fallingStarsThemeControls");
@@ -6413,6 +6744,27 @@
         }
 
         function bindActions(api) {
+          const copyBtn = byId("copyTourCode");
+          if (copyBtn) {
+            copyBtn.addEventListener("click", () => {
+              const selection = getSelection();
+              const snippet = buildTourButtonSnippet(selection);
+              copyTextToClipboard(snippet)
+                .then(() => {
+                  showToast("Tour button code copied");
+                })
+                .catch((err) => {
+                  try {
+                    // eslint-disable-next-line no-console
+                    console.error(err);
+                  } catch (e) {
+                    // ignore
+                  }
+                  showToast("Copy failed - please copy manually", true);
+                });
+            });
+          }
+
           const resetBtn = byId("resetAnimation");
           if (resetBtn) {
             resetBtn.addEventListener("click", () => {
