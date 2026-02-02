@@ -5,59 +5,135 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Visual Effects Pro Dashboard</title>
 
-    <!-- Your CSS is at /css because your tree is at repo root -->
-    <link rel="stylesheet" href="/css/dashboard.css" />
-    <link rel="stylesheet" href="/css/components/tooltips.css" />
+    <!-- Keep everything relative so it works when hosted under a sub-path (Greta preview). -->
+    <base href="./" />
+
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/components/tooltips.css" />
 
     <style>
-      /* Small safety: if CSS fails, you still see something readable */
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
     </style>
   </head>
 
   <body>
-    <!-- Load the dashboard HTML content into #app -->
     <div id="app"></div>
 
-    <!-- Set base path BEFORE loading effects-core.js -->
     <script>
-      // Because css/, js/, effects-assets/ are at the site root:
-      window.EFFECTS_PRO_BASE_PATH = "/";
+      (function () {
+        // Base href from the document (defaults to ./). Ensure it ends with a slash.
+        var baseHref = (document.querySelector('base') && document.querySelector('base').getAttribute('href')) || './';
+        if (baseHref.slice(-1) !== '/') baseHref += '/';
+
+        // Used by effects-core.js when building paths.
+        window.EFFECTS_PRO_BASE_PATH = baseHref;
+
+        // Helpful for debugging in Greta.
+        window.EFFECTS_PRO_BASE_URL = new URL(baseHref, window.location.href).toString();
+      })();
     </script>
 
-    <!-- Load your real engine loader -->
-    <script src="/effects-core.js"></script>
+    <script src="effects-core.js"></script>
 
-    <!-- Pull in the dashboard markup from effects-dashboard.html -->
     <script>
-      (async function () {
-        const app = document.getElementById("app");
+      (function () {
+        function fixRootPaths(root, baseHref) {
+          // Convert src/href that start with / into relative ones so Greta sub-path hosting works.
+          var attrs = ['src', 'href', 'srcset'];
+          var nodes = root.querySelectorAll('[src], [href], [srcset]');
 
-        try {
-          const res = await fetch("/effects-dashboard.html", { cache: "no-store" });
-          if (!res.ok) throw new Error("Failed to load effects-dashboard.html: " + res.status);
+          nodes.forEach(function (el) {
+            attrs.forEach(function (attr) {
+              if (!el.hasAttribute(attr)) return;
+              var val = el.getAttribute(attr);
+              if (!val) return;
 
-          const html = await res.text();
+              // srcset can contain multiple URLs
+              if (attr === 'srcset') {
+                var parts = val.split(',').map(function (p) { return p.trim(); });
+                var next = parts.map(function (p) {
+                  var segs = p.split(/\s+/);
+                  var url = segs[0] || '';
+                  if (url.startsWith('/')) url = baseHref + url.slice(1);
+                  segs[0] = url;
+                  return segs.join(' ');
+                }).join(', ');
+                if (next !== val) el.setAttribute(attr, next);
+                return;
+              }
 
-          // Put the dashboard HTML on the page
-          app.innerHTML = html;
-
-          // Wait until Effects Pro has loaded its modules
-          if (window.effectsPro && window.effectsPro.ready) {
-            await window.effectsPro.ready;
-          }
-
-          console.log("[EffectsPro] Dashboard loaded. Base path =", window.EFFECTS_PRO_BASE_PATH);
-        } catch (err) {
-          console.error(err);
-          app.innerHTML =
-            '<div style="padding:16px;max-width:900px">' +
-            "<h1>Dashboard failed to load</h1>" +
-            "<p>Open DevTools Console for details.</p>" +
-            "<pre style='white-space:pre-wrap;background:#111;color:#eee;padding:12px;border-radius:8px'>" +
-            String(err && err.stack ? err.stack : err) +
-            "</pre></div>";
+              if (val.startsWith('/')) {
+                el.setAttribute(attr, baseHref + val.slice(1));
+              }
+            });
+          });
         }
+
+        function runScripts(root) {
+          // Scripts inserted via innerHTML do not run. Re-create them so they execute.
+          var scripts = Array.from(root.querySelectorAll('script'));
+          scripts.forEach(function (oldScript) {
+            var s = document.createElement('script');
+
+            // Copy attributes
+            Array.from(oldScript.attributes).forEach(function (a) {
+              s.setAttribute(a.name, a.value);
+            });
+
+            // Copy inline code
+            if (oldScript.textContent && oldScript.textContent.trim()) {
+              s.textContent = oldScript.textContent;
+            }
+
+            oldScript.parentNode.replaceChild(s, oldScript);
+          });
+        }
+
+        (async function () {
+          var app = document.getElementById('app');
+          var baseHref = window.EFFECTS_PRO_BASE_PATH || './';
+          if (baseHref.slice(-1) !== '/') baseHref += '/';
+
+          try {
+            var dashboardUrl = new URL('effects-dashboard.html', new URL(baseHref, window.location.href)).toString();
+            var res = await fetch(dashboardUrl, { cache: 'no-store' });
+            if (!res.ok) throw new Error('Failed to load effects-dashboard.html: ' + res.status + ' (' + dashboardUrl + ')');
+
+            var html = await res.text();
+
+            // Parse then rewrite root-absolute paths inside the dashboard markup.
+            var tpl = document.createElement('template');
+            tpl.innerHTML = html;
+            fixRootPaths(tpl.content, baseHref);
+
+            // Render
+            app.innerHTML = '';
+            app.appendChild(tpl.content);
+
+            // If dashboard markup includes scripts, run them.
+            runScripts(app);
+
+            // Wait for Effects Pro engine readiness (if exposed).
+            if (window.effectsPro && window.effectsPro.ready) {
+              await window.effectsPro.ready;
+            }
+
+            console.log('[EffectsPro] Dashboard loaded.', {
+              basePath: window.EFFECTS_PRO_BASE_PATH,
+              baseUrl: window.EFFECTS_PRO_BASE_URL,
+              href: window.location.href
+            });
+          } catch (err) {
+            console.error(err);
+            app.innerHTML =
+              '<div style="padding:16px;max-width:900px">' +
+              '<h1>Dashboard failed to load</h1>' +
+              '<p>Open DevTools Console for details.</p>' +
+              '<pre style="white-space:pre-wrap;background:#111;color:#eee;padding:12px;border-radius:8px">' +
+              String(err && err.stack ? err.stack : err) +
+              '</pre></div>';
+          }
+        })();
       })();
     </script>
   </body>
