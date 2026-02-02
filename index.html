@@ -2,11 +2,63 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Visual Effects Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visual Effects Pro Dashboard</title>
+
+    <!-- Your CSS is at /css because your tree is at repo root -->
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/components/tooltips.css" />
+
+    <style>
+      /* Small safety: if CSS fails, you still see something readable */
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    </style>
   </head>
+
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <!-- Load the dashboard HTML content into #app -->
+    <div id="app"></div>
+
+    <!-- Set base path BEFORE loading effects-core.js -->
+    <script>
+      // Because css/, js/, effects-assets/ are at the site root:
+      window.EFFECTS_PRO_BASE_PATH = "/";
+    </script>
+
+    <!-- Load your real engine loader -->
+    <script src="/effects-core.js"></script>
+
+    <!-- Pull in the dashboard markup from effects-dashboard.html -->
+    <script>
+      (async function () {
+        const app = document.getElementById("app");
+
+        try {
+          const res = await fetch("/effects-dashboard.html", { cache: "no-store" });
+          if (!res.ok) throw new Error("Failed to load effects-dashboard.html: " + res.status);
+
+          const html = await res.text();
+
+          // Put the dashboard HTML on the page
+          app.innerHTML = html;
+
+          // Wait until Effects Pro has loaded its modules
+          if (window.effectsPro && window.effectsPro.ready) {
+            await window.effectsPro.ready;
+          }
+
+          console.log("[EffectsPro] Dashboard loaded. Base path =", window.EFFECTS_PRO_BASE_PATH);
+        } catch (err) {
+          console.error(err);
+          app.innerHTML =
+            '<div style="padding:16px;max-width:900px">' +
+            "<h1>Dashboard failed to load</h1>" +
+            "<p>Open DevTools Console for details.</p>" +
+            "<pre style='white-space:pre-wrap;background:#111;color:#eee;padding:12px;border-radius:8px'>" +
+            String(err && err.stack ? err.stack : err) +
+            "</pre></div>";
+        }
+      })();
+    </script>
   </body>
 </html>
