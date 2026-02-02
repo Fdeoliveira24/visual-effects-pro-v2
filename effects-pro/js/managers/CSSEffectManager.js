@@ -61,14 +61,27 @@
     clear() {
       const layer = this._getCssLayer();
       if (!layer) return;
-      this.clearEffectLayers();
+      this.clearAllLayers();
       layer.textContent = "";
     }
 
     clearEffectLayers() {
       const layer = this._getCssLayer();
       if (!layer) return;
-      const layers = layer.querySelectorAll(".tdv-effect-layer");
+      this._removeLayerNodes(".tdv-effect-layer:not(.tdv-theme-layer)");
+    }
+
+    clearAllLayers() {
+      const layer = this._getCssLayer();
+      if (!layer) return;
+      this._removeLayerNodes(".tdv-effect-layer");
+    }
+
+    _removeLayerNodes(selector) {
+      const layer = this._getCssLayer();
+      if (!layer) return;
+      const layers = layer.querySelectorAll(selector);
+
       for (let i = 0; i < layers.length; i++) {
         const el = layers[i];
         const stopHooks = [
@@ -81,6 +94,10 @@
           "_stopSpinningRays",
           "_stopSineWaves",
           "_stopFlowers",
+          "_stopBalloons",
+          "_stopHalloween",
+          "_stopChristmasLights",
+          "_stopThemeStrobe",
         ];
         for (let j = 0; j < stopHooks.length; j++) {
           const key = stopHooks[j];

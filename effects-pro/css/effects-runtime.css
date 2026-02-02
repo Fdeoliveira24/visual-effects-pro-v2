@@ -27,6 +27,175 @@
   pointer-events: none;
 }
 
+.tdv-selfdestruct {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tdv-selfdestruct-overlay-bg, rgb(255 0 0 / 0.35));
+}
+
+.tdv-selfdestruct-grid {
+  position: absolute;
+  inset: 0;
+  opacity: var(--tdv-selfdestruct-grid-opacity, 0.12);
+  background:
+    repeating-linear-gradient(
+      150deg,
+      rgb(255 255 255 / 0) 0,
+      rgb(255 255 255 / 0) 49px,
+      rgb(255 255 255 / 0.1) 50px,
+      rgb(0 0 0 / 0.3) 51px,
+      rgb(255 255 255 / 0) 55px
+    ),
+    repeating-linear-gradient(
+      30deg,
+      rgb(255 255 255 / 0) 0,
+      rgb(255 255 255 / 0) 49px,
+      rgb(255 255 255 / 0.1) 50px,
+      rgb(0 0 0 / 0.3) 51px,
+      rgb(255 255 255 / 0) 55px
+    );
+}
+
+.tdv-selfdestruct-panel {
+  position: relative;
+  width: min(90vmin, 540px);
+  min-height: min(52vmin, 420px);
+  padding: 2.2vmin 3vmin 3vmin;
+  background: var(--tdv-selfdestruct-warning-bg, rgb(255 0 0 / 0.82));
+  color: var(--tdv-selfdestruct-text, #fff);
+  border-radius: 14px;
+  text-align: center;
+  text-shadow:
+    0 0 1px #fff,
+    0 0 3px #fff,
+    0 0 5px #fff;
+  box-shadow:
+    0 0 0 100vmin var(--tdv-selfdestruct-overlay-bg, rgb(255 0 0 / 0.35)),
+    0 0 0 5vmin var(--tdv-selfdestruct-overlay-bg, rgb(255 0 0 / 0.35));
+  animation: tdv-selfdestruct-warning-light 1s infinite;
+}
+
+.tdv-selfdestruct-title {
+  font-size: clamp(32px, 7vmin, 64px);
+  font-weight: 800;
+  margin-top: 0.5vmin;
+  margin-bottom: 1vmin;
+  padding-bottom: 1vmin;
+  border-bottom: 1vmin dotted currentcolor;
+  text-shadow:
+    0 0 1px #fff,
+    0 0 3px #fff;
+  letter-spacing: 0.08em;
+}
+
+.tdv-selfdestruct-msg {
+  margin-top: 2vmin;
+  margin-bottom: 2vmin;
+  font-size: clamp(14px, 2.8vmin, 20px);
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 2px #fff;
+}
+
+.tdv-selfdestruct-time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: clamp(42px, 10vmin, 84px);
+  max-width: min(70vmin, 360px);
+  margin: 2vmin auto 3vmin;
+  padding: 1.4vmin 0;
+  border-radius: 12px;
+  background: rgb(0 0 0 / 0.5);
+  color: inherit;
+  text-shadow:
+    0 0 3px #000,
+    0 0 4px #000,
+    0 0 5px #000;
+}
+
+.tdv-selfdestruct-time::before {
+  content: "00:";
+}
+
+.tdv-selfdestruct-time.tdv-selfdestruct-crono {
+  background: rgb(255 255 255 / 0.72);
+  color: #d30303;
+  text-shadow:
+    0 0 1px #fff,
+    0 0 2px #fff;
+  transition: background 0.5s ease;
+}
+
+.tdv-selfdestruct-abort {
+  appearance: none;
+  border: 0.4vmin solid rgb(255 255 255 / 0.8);
+  background: rgb(255 255 255 / 0.75);
+  color: #d30303;
+  cursor: pointer;
+  padding: 1.2vmin 3.5vmin;
+  font-size: clamp(18px, 4.6vmin, 38px);
+  font-weight: 800;
+  border-radius: 12px;
+  text-transform: uppercase;
+  text-shadow: none;
+  animation: tdv-selfdestruct-highlight 1s infinite;
+}
+
+.tdv-selfdestruct-abort:hover {
+  background: #fff;
+  box-shadow: 0 0 15px 5px #fff;
+}
+
+.tdv-selfdestruct-abort.tdv-selfdestruct-hide {
+  display: none;
+}
+
+.tdv-selfdestruct-detonate {
+  display: none;
+  margin-top: 1.2vmin;
+  font-size: clamp(26px, 6vmin, 56px);
+  font-weight: 800;
+  text-shadow:
+    0 0 1px #fff,
+    0 0 3px #fff;
+}
+
+.tdv-selfdestruct-detonate.tdv-selfdestruct-show {
+  display: block;
+  animation: tdv-selfdestruct-blink 0.25s infinite;
+}
+
+@keyframes tdv-selfdestruct-highlight {
+  50% {
+    box-shadow: 0 0 15px 5px #fff;
+  }
+}
+
+@keyframes tdv-selfdestruct-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes tdv-selfdestruct-warning-light {
+  0% {
+    box-shadow:
+      0 0 0 100vmin var(--tdv-selfdestruct-overlay-bg, rgb(255 0 0 / 0.35)),
+      0 0 0 5vmin var(--tdv-selfdestruct-overlay-bg, rgb(255 0 0 / 0.35));
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 100vmin rgb(255 0 0 / 0.12),
+      0 0 0 5vmin rgb(255 0 0 / 0.12);
+  }
+}
+
+.tdv-selfdestruct[data-reduced-motion="true"] .tdv-selfdestruct-panel,
+.tdv-selfdestruct[data-reduced-motion="true"] .tdv-selfdestruct-abort,
+.tdv-selfdestruct[data-reduced-motion="true"] .tdv-selfdestruct-detonate.tdv-selfdestruct-show {
+  animation: none !important;
+}
+
 .tdv-flash {
   animation: tdv-flash var(--duration) cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
@@ -587,20 +756,24 @@
   inset: 0;
   font-family: "Courier New", monospace;
   font-size: var(--ascii-size, 10px);
-  line-height: 1.05;
-  letter-spacing: 0.5px;
+  line-height: var(--ascii-line-height, 1.05);
+  letter-spacing: var(--ascii-letter, 0.5px);
   color: var(--ascii-color, #00ff41);
-  background: rgb(0 0 0 / 0.82);
+  background: rgb(0 0 0 / var(--ascii-bg-alpha, 0.82));
   white-space: pre;
-  mix-blend-mode: screen;
-  opacity: 0.85;
+  mix-blend-mode: var(--ascii-blend, screen);
+  opacity: var(--ascii-opacity, 0.85);
 }
 
 .tdv-bulge {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0) 60%);
-  backdrop-filter: blur(1.5px) saturate(1.1);
+  background: radial-gradient(
+    circle at var(--bulge-x, 50%) var(--bulge-y, 50%),
+    rgb(255 255 255 / var(--bulge-glow-alpha, 0.2)),
+    rgb(255 255 255 / 0) var(--bulge-radius, 60%)
+  );
+  backdrop-filter: blur(var(--bulge-blur, 1.5px)) saturate(var(--bulge-saturate, 1.1));
   opacity: 0;
   animation: tdv-bulge var(--duration) ease-out forwards;
   transform: scale(0.85);
@@ -928,12 +1101,12 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(90deg, rgb(0 0 0 / 0.08) 50%, transparent 50%),
-    linear-gradient(0deg, rgb(0 0 0 / 0.08) 50%, transparent 50%);
+    linear-gradient(90deg, var(--pixel-line-color, rgb(0 0 0 / 0.08)) 50%, transparent 50%),
+    linear-gradient(0deg, var(--pixel-line-color, rgb(0 0 0 / 0.08)) 50%, transparent 50%);
   background-size: var(--pixel-size, 8px) var(--pixel-size, 8px);
-  mix-blend-mode: multiply;
+  mix-blend-mode: var(--pixel-blend, multiply);
   opacity: var(--pixel-opacity, 0.5);
-  animation: tdv-eightbit var(--duration) steps(2) infinite;
+  animation: tdv-eightbit var(--pixel-jitter-ms, var(--duration)) steps(2) infinite;
 }
 
 @keyframes tdv-eightbit {
@@ -942,7 +1115,7 @@
   }
 
   50% {
-    transform: translate(2px, 2px);
+    transform: translate(var(--pixel-jitter, 2px), var(--pixel-jitter, 2px));
   }
 
   100% {
@@ -1549,19 +1722,120 @@
   width: 50vw;
 }
 
+.tdv-curtains {
+  --tdv-curtains-duration: 3000ms;
+  --tdv-curtains-easing: ease-out;
+  --tdv-curtains-top: -10%;
+  --tdv-curtains-height: 120%;
+  --tdv-curtains-open-width: 10%;
+  --tdv-curtains-open-offset: 16%;
+  --tdv-curtains-open-rotate: 7deg;
+  --tdv-curtains-color-1: #8b0000;
+  --tdv-curtains-color-2: #bf4848;
+  --tdv-curtains-alpha: 1;
+  --tdv-curtains-rod-height: 30px;
+  --tdv-curtains-rod-color: #6b3b19;
+}
+
+.tdv-curtains .tdv-curtains-rod {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--tdv-curtains-rod-height);
+  background: linear-gradient(to bottom, var(--tdv-curtains-rod-color), #3e2723);
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.5);
+  opacity: var(--tdv-curtains-alpha);
+}
+
+.tdv-curtains .tdv-curtains-rod::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 10px;
+  background: radial-gradient(
+    ellipse at center,
+    var(--tdv-curtains-rod-color) 0%,
+    #654321 55%,
+    rgb(0 0 0 / 0) 85%
+  );
+  opacity: 0.65;
+}
+
+.tdv-curtains .tdv-curtains-panel {
+  position: absolute;
+  top: var(--tdv-curtains-top);
+  height: var(--tdv-curtains-height);
+  width: 50%;
+  opacity: var(--tdv-curtains-alpha);
+  transition:
+    left var(--tdv-curtains-duration) var(--tdv-curtains-easing),
+    right var(--tdv-curtains-duration) var(--tdv-curtains-easing),
+    width var(--tdv-curtains-duration) var(--tdv-curtains-easing),
+    transform var(--tdv-curtains-duration) var(--tdv-curtains-easing);
+  will-change: left, right, width, transform;
+}
+
+.tdv-curtains .tdv-curtains-left {
+  left: 0;
+  background:
+    linear-gradient(to left, rgb(0 0 0 / 0), #9f1833, var(--tdv-curtains-color-2), #9f1833),
+    linear-gradient(
+      to left,
+      var(--tdv-curtains-color-2),
+      var(--tdv-curtains-color-1),
+      var(--tdv-curtains-color-2)
+    );
+  background-size:
+    17% 17%,
+    14% 14%;
+}
+
+.tdv-curtains .tdv-curtains-right {
+  right: 0;
+  background:
+    linear-gradient(to right, rgb(0 0 0 / 0), #9f1833, var(--tdv-curtains-color-2), #9f1833),
+    linear-gradient(
+      to right,
+      var(--tdv-curtains-color-2),
+      var(--tdv-curtains-color-1),
+      var(--tdv-curtains-color-2)
+    );
+  background-size:
+    17% 17%,
+    14% 14%;
+}
+
+.tdv-curtains.is-open .tdv-curtains-left {
+  left: calc(-1 * var(--tdv-curtains-open-offset));
+  width: var(--tdv-curtains-open-width);
+  transform: rotate(var(--tdv-curtains-open-rotate));
+}
+
+.tdv-curtains.is-open .tdv-curtains-right {
+  right: calc(-1 * var(--tdv-curtains-open-offset));
+  width: var(--tdv-curtains-open-width);
+  transform: rotate(calc(-1 * var(--tdv-curtains-open-rotate)));
+}
+
 .tdv-blur {
   position: absolute;
   inset: 0;
-  background: rgb(255 255 255 / 0.02);
-  backdrop-filter: blur(var(--blur, 12px));
+  background: rgb(255 255 255 / var(--blur-bg-alpha, 0.02));
+  mix-blend-mode: var(--blur-blend, normal);
+  backdrop-filter: blur(var(--blur, 12px)) saturate(var(--blur-saturate, 1))
+    brightness(var(--blur-brightness, 1));
 }
 
 .tdv-bleach {
   position: absolute;
   inset: 0;
-  background: rgb(255 255 255 / var(--bleach-alpha, 0.2));
-  mix-blend-mode: screen;
-  backdrop-filter: brightness(1.4) contrast(1.3) saturate(0.7);
+  background: var(--bleach-bg, rgb(255 255 255 / var(--bleach-alpha, 0.2)));
+  mix-blend-mode: var(--bleach-blend, screen);
+  backdrop-filter: brightness(var(--bleach-brightness, 1.4)) contrast(var(--bleach-contrast, 1.3))
+    saturate(var(--bleach-saturate, 0.7));
 }
 
 .tdv-color-correction {
@@ -1589,4 +1863,193 @@
   background: radial-gradient(circle, transparent 1%, #000 1.2%);
 
   /* Initially effectively invisible hole? No, easier to just use the shutters + width. */
+}
+
+/* Movie Countdown (one-shot) */
+.tdv-movie-countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.tdv-movie-countdown .tdv-mc-frame {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  border: var(--tdv-mc-border, 30px) solid var(--tdv-mc-border-color, #000);
+  border-radius: 10px;
+  background: var(--tdv-mc-bg, rgb(17 35 60 / 0));
+}
+
+.tdv-movie-countdown .tdv-mc-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.tdv-movie-countdown .tdv-mc-box {
+  position: relative;
+  overflow: hidden;
+  background: var(--tdv-mc-box-dark, #bebebe);
+  border: 1px solid var(--tdv-mc-box-border, #626262);
+}
+
+.tdv-movie-countdown .tdv-mc-box.is-rotated {
+  transform: rotate(180deg);
+}
+
+.tdv-movie-countdown .tdv-mc-cover {
+  width: 200%;
+  height: 200%;
+  background: var(--tdv-mc-box-light, #d7d7d7);
+  will-change: transform;
+}
+
+.tdv-movie-countdown .tdv-mc-cover.cover2 {
+  transform-origin: top left;
+  animation: tdv-mc-move-1 calc(var(--tdv-mc-box-speed-ms, 1000) * 1ms) infinite linear;
+}
+
+.tdv-movie-countdown .tdv-mc-cover.cover4 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform-origin: top right;
+  animation: tdv-mc-move-2 calc(var(--tdv-mc-box-speed-ms, 1000) * 1ms) infinite linear;
+}
+
+.tdv-movie-countdown .tdv-mc-cover.cover-1-tempo {
+  animation-name: tdv-mc-move-3;
+}
+
+.tdv-movie-countdown .tdv-mc-cover.cover-2-tempo {
+  animation-name: tdv-mc-move-4;
+}
+
+@keyframes tdv-mc-move-1 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  20% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes tdv-mc-move-2 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  20% {
+    transform: rotate(0deg);
+  }
+
+  30% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes tdv-mc-move-3 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  30% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes tdv-mc-move-4 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(0deg);
+  }
+
+  60% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(90deg);
+  }
+}
+
+.tdv-movie-countdown .tdv-mc-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--tdv-mc-size, 664px) * 0.45);
+  height: calc(var(--tdv-mc-size, 664px) * 0.45);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgb(247 247 247 / var(--tdv-mc-circle-bg-opacity, 0.4));
+  border: var(--tdv-mc-circle-border, 20px) double var(--tdv-mc-circle-border-color, #fff);
+  z-index: 2;
+}
+
+.tdv-movie-countdown .tdv-mc-numbers {
+  position: absolute;
+  inset: 0;
+  color: var(--tdv-mc-number-color, #202020);
+}
+
+.tdv-movie-countdown .tdv-mc-number {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--tdv-mc-size, 664px) * 0.33);
+  line-height: 1;
+  opacity: 0;
+  animation-name: tdv-mc-countdown;
+  animation-duration: var(--tdv-mc-step-ms, 1000ms);
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+@keyframes tdv-mc-countdown {
+  0% {
+    opacity: 0;
+  }
+
+  1% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }

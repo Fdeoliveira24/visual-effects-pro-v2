@@ -31,7 +31,7 @@
 
     const size = getStageSize();
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-shader-burn";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-shader-burn";
     container.style.cssText = "position:absolute;inset:0;pointer-events:none;";
 
     const canvas = document.createElement("canvas");
@@ -210,7 +210,7 @@
 
     const size = getStageSize();
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-shader-smoke";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-shader-smoke";
     container.style.cssText = "position:absolute;inset:0;pointer-events:none;";
 
     const canvas = document.createElement("canvas");
@@ -409,7 +409,7 @@
     const showBackground = cfg.showBackground !== false;
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-fire";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-fire";
 
     const brightness = 3.7 * intensity;
     const contrast = 6.0 * Math.pow(intensity, 0.8);
@@ -457,6 +457,13 @@
     return container;
   }
 
+  try {
+    effectsPro._internals = effectsPro._internals || {};
+    effectsPro._internals._createCSSFireOverlay = createCSSFireOverlay;
+  } catch {
+    // ignore
+  }
+
   function createCSSBokehOverlay(_ctx, cfg) {
     const lightCount = clamp(Number(cfg.lightCount) || 150, 50, 300);
     const lightSize = clamp(Number(cfg.lightSize) || 75, 50, 150);
@@ -465,7 +472,7 @@
     const palette = cfg.palette || "festive";
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-bokeh";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-bokeh";
 
     const palettes = {
       festive: [
@@ -527,6 +534,13 @@
     return container;
   }
 
+  try {
+    effectsPro._internals = effectsPro._internals || {};
+    effectsPro._internals._createCSSBokehOverlay = createCSSBokehOverlay;
+  } catch {
+    // ignore
+  }
+
   const SPINNING_RAYS_STYLE_ID = "tdv-spinning-rays-style";
   const SPINNING_RAYS_CSS = `
     #tdv-effects-root .tdv-spinning-rays{position:absolute;inset:0;pointer-events:none;}
@@ -553,7 +567,7 @@
     ensureSpinningRaysStylesInjected();
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-spinning-rays";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-spinning-rays";
     container.setAttribute("aria-hidden", "true");
 
     const canvas = document.createElement("canvas");
@@ -872,6 +886,8 @@
     return container;
   }
 
+  effectsPro._internals._createSpinningRaysOverlay = createSpinningRaysOverlay;
+
   const SINE_WAVES_STYLE_ID = "tdv-sine-waves-style";
   const SINE_WAVES_CSS = `
 		    #tdv-effects-root .tdv-sine-waves{position:absolute;inset:0;pointer-events:none;}
@@ -898,7 +914,9 @@
       try {
         if (ctx && typeof ctx.getConfig === "function") {
           const rootCfg = ctx.getConfig();
-          const live = rootCfg && rootCfg.themes ? rootCfg.themes.sineWaves : null;
+          const live =
+            (rootCfg && rootCfg.effects ? rootCfg.effects.sineWaves : null) ||
+            (rootCfg && rootCfg.themes ? rootCfg.themes.sineWaves : null);
           if (live && typeof live === "object") return live;
         }
       } catch {
@@ -908,7 +926,7 @@
     }
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-sine-waves";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-sine-waves";
     container.setAttribute("aria-hidden", "true");
 
     const canvas = document.createElement("canvas");
@@ -1159,6 +1177,8 @@
     return container;
   }
 
+  effectsPro._internals._createSineWavesOverlay = createSineWavesOverlay;
+
   // eslint-disable-next-line max-lines-per-function
   function createShaderWaterOverlay(ctx, cfg) {
     const { getStageSize } = ctx;
@@ -1216,7 +1236,7 @@
     const dpr = Math.min(2, window.devicePixelRatio || 1);
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-water-shader";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-water-shader";
     container.style.cssText =
       "position:absolute;inset:0;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.2s ease-in;";
 
@@ -1238,7 +1258,7 @@
 
     if (!gl) {
       const fallback = document.createElement("div");
-      fallback.className = "tdv-effect-layer tdv-water-fallback";
+      fallback.className = "tdv-effect-layer tdv-theme-layer tdv-water-fallback";
       fallback.style.setProperty(
         "--water-fallback-duration",
         `${Math.round(4000 / Math.max(0.4, flowSpeed))}ms`
@@ -1349,7 +1369,7 @@
     const frg = compileShader(fragmentSrc, gl.FRAGMENT_SHADER);
     if (!vtx || !frg) {
       const fallback = document.createElement("div");
-      fallback.className = "tdv-effect-layer tdv-water-fallback";
+      fallback.className = "tdv-effect-layer tdv-theme-layer tdv-water-fallback";
       container.appendChild(fallback);
       return container;
     }
@@ -1360,7 +1380,7 @@
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       const fallback = document.createElement("div");
-      fallback.className = "tdv-effect-layer tdv-water-fallback";
+      fallback.className = "tdv-effect-layer tdv-theme-layer tdv-water-fallback";
       container.appendChild(fallback);
       return container;
     }
@@ -1448,7 +1468,7 @@
     function handleTextureError() {
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
       const fallback = document.createElement("div");
-      fallback.className = "tdv-effect-layer tdv-water-fallback";
+      fallback.className = "tdv-effect-layer tdv-theme-layer tdv-water-fallback";
       container.appendChild(fallback);
     }
 
@@ -1489,6 +1509,8 @@
 
     return container;
   }
+
+  effectsPro._internals._createShaderWaterOverlay = createShaderWaterOverlay;
 
   const HALLOWEEN_SPIDERS_STYLE_ID = "tdv-halloween-spiders-style";
   const HALLOWEEN_SPIDERS_CSS = `
@@ -2016,7 +2038,7 @@
   function createHalloweenSpidersOverlay(ctx, cfg) {
     ensureHalloweenSpidersStylesInjected();
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-halloween-spiders";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-halloween-spiders";
     container.setAttribute("aria-hidden", "true");
 
     const ghosts = createHalloweenGhosts(ctx, cfg);
@@ -2293,7 +2315,15 @@
       try {
         if (ctx && typeof ctx.getConfig === "function") {
           const rootCfg = ctx.getConfig();
-          const live = rootCfg && rootCfg.themes ? rootCfg.themes.flowers : null;
+          const liveFromEffects =
+            rootCfg && rootCfg.effects && typeof rootCfg.effects.flowers === "object"
+              ? rootCfg.effects.flowers
+              : null;
+          const liveFromThemes =
+            rootCfg && rootCfg.themes && typeof rootCfg.themes.flowers === "object"
+              ? rootCfg.themes.flowers
+              : null;
+          const live = liveFromEffects || liveFromThemes;
           if (live && typeof live === "object") return live;
         }
       } catch {
@@ -2303,7 +2333,7 @@
     }
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-flowers";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-flowers";
     container.setAttribute("aria-hidden", "true");
 
     const canvas = document.createElement("canvas");
@@ -2800,6 +2830,8 @@
     return container;
   }
 
+  effectsPro._internals._createFlowersOverlay = createFlowersOverlay;
+
   const BALLOONS_STYLE_ID = "tdv-balloons-style";
   const BALLOONS_CSS = `
 			    #tdv-effects-root .tdv-balloons{position:absolute;inset:0;pointer-events:none;}
@@ -2826,8 +2858,11 @@
       try {
         if (ctx && typeof ctx.getConfig === "function") {
           const rootCfg = ctx.getConfig();
-          const live = rootCfg && rootCfg.themes ? rootCfg.themes.balloons : null;
-          if (live && typeof live === "object") return live;
+          const liveEffect = rootCfg && rootCfg.effects ? rootCfg.effects.balloons : null;
+          if (liveEffect && typeof liveEffect === "object") return liveEffect;
+
+          const liveTheme = rootCfg && rootCfg.themes ? rootCfg.themes.balloons : null;
+          if (liveTheme && typeof liveTheme === "object") return liveTheme;
         }
       } catch {
         // ignore
@@ -2836,7 +2871,7 @@
     }
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-balloons";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-balloons";
     container.setAttribute("aria-hidden", "true");
 
     const canvas = document.createElement("canvas");
@@ -3364,6 +3399,8 @@
     return container;
   }
 
+  effectsPro._internals._createBalloonsOverlay = createBalloonsOverlay;
+
   const STORM_STYLE_ID = "tdv-storm-style";
   const STORM_CSS = `
 			    #tdv-effects-root .tdv-storm{position:absolute;inset:0;overflow:hidden;}
@@ -3445,7 +3482,7 @@
     ensureStormStylesInjected();
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-storm";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-storm";
     container.setAttribute("aria-hidden", "true");
 
     const bgOpacity = clamp(Number(cfg.backgroundOpacity), 0, 1);
@@ -3686,13 +3723,20 @@
     return container;
   }
 
+  try {
+    effectsPro._internals = effectsPro._internals || {};
+    effectsPro._internals._createStormOverlay = createStormOverlay;
+  } catch {
+    // ignore
+  }
+
   // eslint-disable-next-line max-lines-per-function
   function createFallingStarsOverlay(ctx, cfg) {
     const { getStageSize } = ctx;
     const size = getStageSize();
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-falling-stars";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-falling-stars";
     container.style.cssText = "position:absolute;inset:0;pointer-events:none;overflow:hidden;";
 
     const canvas = document.createElement("canvas");
@@ -4008,7 +4052,7 @@
     ensureElectricStylesInjected();
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-electric";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-electric";
 
     const minDelay = Number(cfg.minDelay) || 50;
     const maxDelay = Number(cfg.maxDelay) || 600;
@@ -4215,6 +4259,13 @@
     return container;
   }
 
+  try {
+    effectsPro._internals = effectsPro._internals || {};
+    effectsPro._internals._createElectricOverlay = createElectricOverlay;
+  } catch {
+    // ignore
+  }
+
   function ensureChristmasLightsStylesInjected() {
     if (!dom) return;
     if (typeof dom.ensureStylesheet === "function") {
@@ -4234,7 +4285,7 @@
     ensureChristmasLightsStylesInjected();
 
     const container = document.createElement("div");
-    container.className = "tdv-effect-layer tdv-christmas-lights";
+    container.className = "tdv-effect-layer tdv-theme-layer tdv-christmas-lights";
     container.setAttribute("aria-hidden", "true");
 
     const starsContainer = document.createElement("div");
@@ -4749,10 +4800,6 @@
         merged.opacity = merged.opacity || 0.78;
       }
 
-      if (themeName === "easter") {
-        merged.type = "egg";
-      }
-
       if (themeName === "fallingStars") {
         merged.type = "fallingStars";
         merged.cssOnly = false;
@@ -5138,7 +5185,7 @@
         const frequency = clamp(Number(cfg.frequency) || 8, 1, 30);
         const periodMs = Math.max(80, Math.round(1000 / frequency));
         const el = document.createElement("div");
-        el.className = "tdv-effect-layer tdv-theme-strobe";
+        el.className = "tdv-effect-layer tdv-theme-layer tdv-theme-strobe";
         el.style.setProperty("--duration", `${periodMs}ms`);
         el.style.background = cfg.color || "rgba(255,255,255,0.22)";
         cssLayer.appendChild(el);

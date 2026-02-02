@@ -294,12 +294,27 @@
         if (!effectName || !this.effectManager.hasEffect(effectName)) return;
         if (!this.canvasManager.ensureOverlay()) return;
 
-        this.stopOverlayTheme();
-        // Clear the entire CSS layer (some effects append non-`.tdv-effect-layer` nodes).
-        this.cssEffectManager.clear();
-        this.particleManager.clearAll();
-        this.canvasManager.stopLoop();
-        this.canvasManager.clearCanvas();
+        const library = effectsPro && effectsPro._data ? effectsPro._data.EFFECTS_LIBRARY : null;
+        const libraryCfg = library && library[effectName] ? library[effectName] : null;
+        let stacking = "exclusive";
+        if (overrides && overrides.stacking) stacking = overrides.stacking;
+        else if (libraryCfg && libraryCfg.stacking) stacking = libraryCfg.stacking;
+
+        if (stacking === "additive") {
+          if (
+            this.cssEffectManager &&
+            typeof this.cssEffectManager.clearEffectLayers === "function"
+          ) {
+            this.cssEffectManager.clearEffectLayers();
+          }
+        } else {
+          this.stopOverlayTheme();
+          // Clear the entire CSS layer (some effects append non-`.tdv-effect-layer` nodes).
+          this.cssEffectManager.clear();
+          this.particleManager.clearAll();
+          this.canvasManager.stopLoop();
+          this.canvasManager.clearCanvas();
+        }
 
         this.effectManager.play(effectName, overrides);
         this.lastPlayedEffect = effectName;
@@ -314,6 +329,16 @@
         if (!cfg || !cfg.enabled) return;
         if (!this.domEnabled) this.domEnabled = true;
         if (!this.canvasManager.ensureOverlay()) return;
+
+        // Back-compat: if a theme was migrated to a one-shot effect, route it through playEffect.
+        const themeDef =
+          this.themeManager && typeof this.themeManager.getThemeDefinition === "function"
+            ? this.themeManager.getThemeDefinition(themeName)
+            : null;
+        if (!themeDef && this.effectManager && this.effectManager.hasEffect(themeName)) {
+          this.playEffect(themeName, { stacking: "exclusive" });
+          return;
+        }
 
         this.stopOverlayTheme();
         // Clear the entire CSS layer (some effects append non-`.tdv-effect-layer` nodes).

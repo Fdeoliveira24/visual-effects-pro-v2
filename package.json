@@ -1,44 +1,22 @@
 {
   "name": "visual-effects-pro",
+  "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Visual Effects Pro for 3DVista Tours - Production-ready effects library",
-  "main": "effects-pro/effects-core.js",
-  "scripts": {
-    "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
-    "lint:js": "eslint \"effects-pro/**/*.js\"",
-    "lint:css": "stylelint \"effects-pro/**/*.css\"",
-    "lint:html": "htmlhint \"effects-pro/**/*.html\"",
-    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix && npm run format",
-    "format": "prettier --write \"effects-pro/**/*.{js,css,html,json,md}\"",
-    "format:check": "prettier --check \"effects-pro/**/*.{js,css,html,json,md}\"",
-    "validate": "npm run format:check && npm run lint",
-    "precommit": "npm run lint:fix"
-  },
-  "keywords": [
-    "3dvista",
-    "effects",
-    "visual-effects",
-    "animations",
-    "webgl",
-    "canvas"
-  ],
-  "author": "",
-  "license": "UNLICENSED",
-  "private": true,
-  "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "eslint": "^9.17.0",
-    "eslint-config-prettier": "^9.1.0",
-    "globals": "^15.13.0",
-    "htmlhint": "^1.1.4",
-    "prettier": "^3.4.2",
-    "stylelint": "^16.12.0",
-    "stylelint-config-standard": "^36.0.1",
-    "stylelint-prettier": "^5.0.2"
-  },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "vite": "^5.4.1"
   }
 }

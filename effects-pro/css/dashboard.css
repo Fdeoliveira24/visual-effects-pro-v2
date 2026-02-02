@@ -216,6 +216,10 @@ h1 {
   display: none;
 }
 
+.sidebar-collapsed .tour-code-controls {
+  display: none;
+}
+
 .sidebar-collapsed .btn-label {
   display: none;
 }
@@ -456,6 +460,27 @@ input[type="number"] {
     border-color 0.2s ease,
     box-shadow 0.2s ease,
     transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.radio-card label::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgb(255 255 255 / 0.06) 40%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+  pointer-events: none;
+}
+
+.radio-card label:hover::after {
+  transform: translateX(120%);
 }
 
 .radio-card input:checked + label {
@@ -517,6 +542,21 @@ input[type="number"] {
   transform: translateY(-1px);
 }
 
+.btn:disabled,
+.btn.is-disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn:disabled:hover,
+.btn.is-disabled:hover,
+.btn[aria-disabled="true"]:hover {
+  transform: none;
+}
+
 .btn.ghost {
   background: transparent;
   color: var(--text);
@@ -533,6 +573,21 @@ input[type="number"] {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
+}
+
+/*
+ * Some migrated (former theme) tuning sections still use `.theme-controls` wrappers
+ * instead of `.settings-grid`. To keep the dashboard layout consistent, render them
+ * with the same grid rules.
+ */
+.theme-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.theme-controls > * {
+  min-width: 0;
 }
 
 .settings-group {
