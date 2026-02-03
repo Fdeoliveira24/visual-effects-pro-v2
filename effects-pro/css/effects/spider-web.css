@@ -1,0 +1,35 @@
+/* Effects Pro - Spider Web effect */
+#tdv-effects-root .tdv-spider-web {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  animation: tdv-spider-web-inout var(--duration, 4500ms) ease-in-out both;
+}
+
+#tdv-effects-root .tdv-spider-web canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+@keyframes tdv-spider-web-inout {
+  0% {
+    opacity: 0;
+  }
+
+  4% {
+    opacity: var(--opacity, 0.85);
+  }
+
+  92% {
+    opacity: var(--opacity, 0.85);
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

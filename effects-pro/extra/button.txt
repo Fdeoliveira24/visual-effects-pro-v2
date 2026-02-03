@@ -1,0 +1,23 @@
+try {
+	if (window.tourEffectsFunctions) {
+		window.tourEffectsFunctions.loadConfig();
+		window.tourEffectsFunctions.initializeEffects(this);
+
+		var cfg = window.tourEffectsFunctions.getConfig ? window.tourEffectsFunctions.getConfig() : null;
+		var enabled = cfg ? cfg.enabled !== false : true;
+		var mode = cfg && cfg.mode ? cfg.mode : 'both';
+
+		if (enabled && (mode === 'dom' || mode === 'both' || mode === 'button')) {
+			window.tourEffectsFunctions.enableDomOverlay(true);
+		} else if (!enabled) {
+			window.tourEffectsFunctions.enableDomOverlay(false);
+		}
+
+		var effect = cfg && cfg.preferredEffect ? cfg.preferredEffect : 'sparkles';
+		window.tourEffectsFunctions.playEffect(effect);
+	} else {
+		console.warn('Effects core not loaded yet (tourEffectsFunctions missing).');
+	}
+} catch (error) {
+	console.error('Effects button action error:', error);
+}

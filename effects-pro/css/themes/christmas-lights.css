@@ -1,0 +1,305 @@
+/* Effects Pro - Christmas Lights theme */
+#tdv-effects-root .tdv-christmas-lights {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+#tdv-effects-root .tdv-christmas-lights,
+#tdv-effects-root .tdv-christmas-lights * {
+  box-sizing: border-box;
+}
+
+#tdv-effects-root .tdv-christmas-lights .stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  z-index: 1;
+}
+
+#tdv-effects-root .tdv-christmas-lights .star {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  animation: tdv-christmas-lights-twinkle 3s infinite ease-in-out;
+}
+
+@keyframes tdv-christmas-lights-twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+#tdv-effects-root .tdv-christmas-lights .bokeh-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+#tdv-effects-root .tdv-christmas-lights .bokeh {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(8px);
+  opacity: 0.3;
+  animation: tdv-christmas-lights-bokeh-float 15s infinite ease-in-out;
+}
+
+@keyframes tdv-christmas-lights-bokeh-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 0 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li {
+  position: relative;
+  animation-fill-mode: both;
+  animation-iteration-count: infinite;
+  list-style: none;
+  padding: 0;
+  display: inline-block;
+  width: 12px;
+  height: 28px;
+  border-radius: 50%;
+  margin: 20px;
+  background: rgb(0 247 165 / 1);
+  box-shadow: 0 4.66px 24px 3px rgb(0 247 165 / 1);
+  animation-name: flash-1;
+  animation-duration: 2s;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li:nth-child(5n + 1) {
+  background: rgb(255 50 50 / 1);
+  box-shadow: 0 4.66px 24px 3px rgb(255 50 50 / 1);
+  animation-name: tdv-christmas-lights-flash-red;
+  animation-duration: 1.5s;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li:nth-child(5n + 2) {
+  background: rgb(255 215 0 / 1);
+  box-shadow: 0 4.66px 24px 3px rgb(255 215 0 / 1);
+  animation-name: tdv-christmas-lights-flash-gold;
+  animation-duration: 1.8s;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li:nth-child(5n + 3) {
+  background: rgb(0 150 255 / 1);
+  box-shadow: 0 4.66px 24px 3px rgb(0 150 255 / 1);
+  animation-name: tdv-christmas-lights-flash-blue;
+  animation-duration: 2.2s;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li:nth-child(5n + 4) {
+  background: rgb(0 255 100 / 1);
+  box-shadow: 0 4.66px 24px 3px rgb(0 255 100 / 1);
+  animation-name: tdv-christmas-lights-flash-green;
+  animation-duration: 1.6s;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li:nth-child(5n) {
+  background: rgb(255 255 255 / 1);
+  box-shadow: 0 4.66px 24px 3px rgb(255 255 255 / 1);
+  animation-name: tdv-christmas-lights-flash-white;
+  animation-duration: 2.4s;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li::before {
+  content: "";
+  position: absolute;
+  background: #222;
+  width: 10px;
+  height: 9.33px;
+  border-radius: 3px;
+  top: -4.66px;
+  left: 1px;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li::after {
+  content: "";
+  top: -14px;
+  left: 9px;
+  position: absolute;
+  width: 52px;
+  height: 18.66px;
+  border-bottom: solid #222 2px;
+  border-radius: 50%;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li:last-child::after {
+  content: none;
+}
+
+#tdv-effects-root .tdv-christmas-lights .lightrope li:first-child {
+  margin-left: -40px;
+}
+
+@keyframes tdv-christmas-lights-flash-red {
+  0%,
+  100% {
+    background: rgb(255 50 50 / 1);
+    box-shadow: 0 4.66px 24px 3px rgb(255 50 50 / 1);
+  }
+
+  50% {
+    background: rgb(255 50 50 / 0.4);
+    box-shadow: 0 4.66px 24px 3px rgb(255 50 50 / 0.2);
+  }
+}
+
+@keyframes tdv-christmas-lights-flash-gold {
+  0%,
+  100% {
+    background: rgb(255 215 0 / 1);
+    box-shadow: 0 4.66px 24px 3px rgb(255 215 0 / 1);
+  }
+
+  50% {
+    background: rgb(255 215 0 / 0.4);
+    box-shadow: 0 4.66px 24px 3px rgb(255 215 0 / 0.2);
+  }
+}
+
+@keyframes tdv-christmas-lights-flash-blue {
+  0%,
+  100% {
+    background: rgb(0 150 255 / 1);
+    box-shadow: 0 4.66px 24px 3px rgb(0 150 255 / 1);
+  }
+
+  50% {
+    background: rgb(0 150 255 / 0.4);
+    box-shadow: 0 4.66px 24px 3px rgb(0 150 255 / 0.2);
+  }
+}
+
+@keyframes tdv-christmas-lights-flash-green {
+  0%,
+  100% {
+    background: rgb(0 255 100 / 1);
+    box-shadow: 0 4.66px 24px 3px rgb(0 255 100 / 1);
+  }
+
+  50% {
+    background: rgb(0 255 100 / 0.4);
+    box-shadow: 0 4.66px 24px 3px rgb(0 255 100 / 0.2);
+  }
+}
+
+@keyframes tdv-christmas-lights-flash-white {
+  0%,
+  100% {
+    background: rgb(255 255 255 / 1);
+    box-shadow: 0 4.66px 24px 3px rgb(255 255 255 / 1);
+  }
+
+  50% {
+    background: rgb(255 255 255 / 0.4);
+    box-shadow: 0 4.66px 24px 3px rgb(255 255 255 / 0.2);
+  }
+}
+
+#tdv-effects-root .tdv-christmas-lights .snow-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+#tdv-effects-root .tdv-christmas-lights .snowflake {
+  position: absolute;
+  top: -10px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: tdv-christmas-lights-fall linear infinite;
+}
+
+#tdv-effects-root .tdv-christmas-lights .snowflake.far {
+  opacity: 0.4;
+  filter: blur(2px);
+}
+
+#tdv-effects-root .tdv-christmas-lights .snowflake.near {
+  opacity: 0.9;
+  z-index: 15;
+}
+
+#tdv-effects-root .tdv-christmas-lights .snow-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background: linear-gradient(to bottom, #fff 0%, #e8f4f8 100%);
+  box-shadow: 0 -10px 30px rgb(255 255 255 / 0.6);
+  z-index: 6;
+  animation: tdv-christmas-lights-accumulate var(--tdv-cl-accum-dur, 45s) linear forwards;
+}
+
+#tdv-effects-root .tdv-christmas-lights .snow-ground::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgb(255 255 255 / 0.8) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 60%, rgb(255 255 255 / 0.9) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 40%, rgb(255 255 255 / 0.7) 0%, transparent 50%);
+}
+
+@keyframes tdv-christmas-lights-fall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translateY(110vh) translateX(var(--drift)) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes tdv-christmas-lights-accumulate {
+  0% {
+    height: 0;
+  }
+
+  100% {
+    height: var(--tdv-cl-accum-height, 200px);
+  }
+}
