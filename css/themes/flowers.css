@@ -1,0 +1,15 @@
+/* Effects Pro - Flowers theme */
+#tdv-effects-root .tdv-flowers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#tdv-effects-root .tdv-flowers canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}

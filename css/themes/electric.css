@@ -1,0 +1,85 @@
+/* Effects Pro - Electric theme */
+#tdv-effects-root .tdv-electric {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#tdv-effects-root .tdv-electric-shake {
+  animation: tdv-electric-shake 240ms linear;
+}
+
+@keyframes tdv-electric-shake {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  10% {
+    transform: translate3d(
+      calc(-2px * var(--shake-intensity, 1)),
+      calc(1px * var(--shake-intensity, 1)),
+      0
+    );
+  }
+
+  20% {
+    transform: translate3d(
+      calc(2px * var(--shake-intensity, 1)),
+      calc(-1px * var(--shake-intensity, 1)),
+      0
+    );
+  }
+
+  30% {
+    transform: translate3d(
+      calc(-3px * var(--shake-intensity, 1)),
+      calc(2px * var(--shake-intensity, 1)),
+      0
+    );
+  }
+
+  40% {
+    transform: translate3d(
+      calc(3px * var(--shake-intensity, 1)),
+      calc(-2px * var(--shake-intensity, 1)),
+      0
+    );
+  }
+
+  55% {
+    transform: translate3d(
+      calc(-2px * var(--shake-intensity, 1)),
+      calc(1px * var(--shake-intensity, 1)),
+      0
+    );
+  }
+
+  70% {
+    transform: translate3d(
+      calc(2px * var(--shake-intensity, 1)),
+      calc(-1px * var(--shake-intensity, 1)),
+      0
+    );
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes tdv-electric-spark-shoot {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.2);
+  }
+
+  8% {
+    opacity: 1;
+    transform: translate3d(calc(var(--tx) * 0.2), calc(var(--ty) * 0.2), 0) scale(0.8);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--tx), var(--ty), 0) scale(0.2);
+  }
+}

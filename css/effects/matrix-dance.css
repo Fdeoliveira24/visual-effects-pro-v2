@@ -1,0 +1,15 @@
+/* Effects Pro - Matrix Dance effect */
+#tdv-effects-root .tdv-matrix-dance {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#tdv-effects-root .tdv-matrix-dance canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}

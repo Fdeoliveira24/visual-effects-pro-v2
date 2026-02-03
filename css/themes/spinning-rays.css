@@ -1,0 +1,15 @@
+/* Effects Pro - Spinning Rays theme */
+#tdv-effects-root .tdv-spinning-rays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#tdv-effects-root .tdv-spinning-rays canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
